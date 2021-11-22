@@ -32,6 +32,9 @@
 #include "uf2.h"
 #include "tusb.h"
 
+uint32_t appVector_1 = 0;
+uint32_t board_flash_app_start = 0;
+uint32_t board_flash_sizexxx = 0;
 //--------------------------------------------------------------------+
 // MACRO CONSTANT TYPEDEF PROTYPES
 //--------------------------------------------------------------------+
@@ -55,28 +58,40 @@ uint8_t const RGB_OFF[]           = { 0x00, 0x00, 0x00 };
 
 static volatile uint32_t _timer_count = 0;
 
+
 //--------------------------------------------------------------------+
 //
 //--------------------------------------------------------------------+
+//check whether system is in dfu mode, dfu mode is used to firmware upgrade
 static bool check_dfu_mode(void);
+//print log information for debug
+static void printLog(const char * logInfo);
 
 int main(void)
 {
+  //board initialization
   board_init();
-  TU_LOG1("TinyUF2\r\n");
-
+  
+  //print demo prompt
+  printLog("NXP TinyUF2 Demo(Important Release) 20211122_10:48\n");
+  
   // if not DFU mode, jump to App
-  if ( !check_dfu_mode() )
+  if(!check_dfu_mode())
   {
-    TU_LOG1("Jump to application\r\n");
+	//prompt user to enter user application mode
+    printLog("Enter user application mode to run user application!\n");
+	//Jump to run user application 
     board_app_jump();
     while(1) {}
   }
-
-  TU_LOG1("Start DFU mode\r\n");
+ 
+  //DFU USB initialization
   board_dfu_init();
+  //Board flash initialization
   board_flash_init();
+  //UF2 initialization
   uf2_init();
+  //USB stack initialization
   tusb_init();
 
   indicator_set(STATE_USB_UNPLUGGED);
@@ -85,7 +100,10 @@ int main(void)
   board_display_init();
   screen_draw_drag();
 #endif
-
+  
+  //prompt user to enter user application mode
+  printLog("Enter DFU mode to upgrade firmware!\n");
+	
 #if (CFG_TUSB_OS == OPT_OS_NONE || CFG_TUSB_OS == OPT_OS_PICO)
   while(1)
   {
@@ -94,6 +112,17 @@ int main(void)
 #endif
 }
 
+//print log information for debug
+static void printLog(const char * logInfo)
+{
+	//log buffer
+	char logBuffer[100];
+	
+	//copy log information to buffer
+	strcpy(logBuffer,logInfo);
+	//call uart API to send log information to terminal on PC end
+	board_uart_write(logBuffer,strlen(logBuffer));
+}
 
 // return true if start DFU mode, else App mode
 static bool check_dfu_mode(void)
@@ -101,7 +130,6 @@ static bool check_dfu_mode(void)
   // TODO enable for all port instead of one with double tap
 #if TINYUF2_DFU_DOUBLE_TAP
   // TUF2_LOG1_HEX(&DBL_TAP_REG);
-
   // Erase application
   if (DBL_TAP_REG == DBL_TAP_MAGIC_ERASE_APP)
   {
@@ -110,14 +138,22 @@ static bool check_dfu_mode(void)
     indicator_set(STATE_WRITING_STARTED);
     board_flash_erase_app();
     indicator_set(STATE_WRITING_FINISHED);
-
     // TODO maybe reset is better than continue
   }
 #endif
-
+  
   // Check if app is valid
-  if ( !board_app_valid() ) return true;
-
+  if ( !board_app_valid() ) 
+  {
+	  //Prompt the user that no valid firmware has been detected
+      printLog("Invalid firmware!\n");
+	  
+	  return true;
+  }
+  
+  //Prompt the user that valid firmware has been detected
+  printLog("Valid firmware!\n");
+	  
 #if TINYUF2_DFU_DOUBLE_TAP
 //  TU_LOG1_HEX(DBL_TAP_REG);
 
@@ -132,7 +168,11 @@ static bool check_dfu_mode(void)
   {
     // Double tap occurred
     DBL_TAP_REG = 0;
+	
     TU_LOG1("Double Tap Reset\r\n");
+	//Prompt the user to detect a reset double tap
+    printLog("System has detected double tap of reset!\n");
+	
     return true;
   }
 
@@ -150,7 +190,9 @@ static bool check_dfu_mode(void)
   board_rgb_write(RGB_DOUBLE_TAP);
 
   // delay a fraction of second if Reset pin is tap during this delay --> we will enter dfu
-  while(_timer_count < DBL_TAP_DELAY) {}
+  while(_timer_count < DBL_TAP_DELAY) 
+  {
+  }
   board_timer_stop();
 
   // Turn off indicator

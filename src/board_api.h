@@ -74,6 +74,9 @@ void board_reset(void);
 // Write PWM duty value to LED
 void board_led_write(uint32_t value);
 
+// Toggle LED status
+void board_led_toggle(void);
+
 // Write color to rgb strip
 void board_rgb_write(uint8_t const rgb[]);
 
@@ -82,6 +85,9 @@ void board_uart_init(uint32_t baud_rate);
 
 // Send characters to UART for debugging
 int board_uart_write(void const * buf, int len);
+
+// Receive characters to UART for debugging
+int board_uart_read(uint8_t* buf, int len);
 
 // start timer with ms interval
 void board_timer_start(uint32_t ms);
