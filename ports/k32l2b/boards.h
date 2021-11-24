@@ -35,7 +35,7 @@
 //Flash start address of user application
 #define BOARD_FLASH_APP_START    0x10000 
 //Enable Device Firmware Upgrade by checking double tap reset 
-#define TINYUF2_DFU_DOUBLE_TAP   1
+#define TINYUF2_DFU_DOUBLE_TAP   0
 
 #ifdef __cplusplus
  }

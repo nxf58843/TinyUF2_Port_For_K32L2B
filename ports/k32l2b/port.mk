@@ -25,13 +25,13 @@ SRC_C += \
 	$(MCU_DIR)/system_$(MCU_CORE).c \
 	$(MCU_DIR)/project_template/clock_config.c \
 	$(MCU_DIR)/drivers/fsl_clock.c \
-	$(MCU_DIR)/drivers/fsl_gpio.c \
-	$(MCU_DIR)/drivers/fsl_lpuart.c \
-    $(MCU_DIR)/drivers/fsl_ftfx_flash.c \
-	$(MCU_DIR)/drivers/fsl_ftfx_controller.c \
-	$(MCU_DIR)/drivers/fsl_ftfx_cache.c \
-	$(MCU_DIR)/drivers/fsl_ftfx_flexnvm.c \
-	$(MCU_DIR)/drivers/fsl_sim.c
+	$(SDK_DIR)/drivers/gpio/fsl_gpio.c \
+	$(SDK_DIR)/drivers/lpuart/fsl_lpuart.c \
+    $(SDK_DIR)/drivers/flash/fsl_ftfx_flash.c \
+	$(SDK_DIR)/drivers/flash/fsl_ftfx_controller.c \
+	$(SDK_DIR)/drivers/flash/fsl_ftfx_cache.c \
+	$(SDK_DIR)/drivers/flash/fsl_ftfx_flexnvm.c \
+	$(SDK_DIR)/drivers/sim/fsl_sim.c
 	
 # Port include
 INC += \
@@ -41,5 +41,11 @@ INC += \
 	$(TOP)/$(MCU_DIR) \
 	$(TOP)/$(MCU_DIR)/project_template \
 	$(TOP)/$(MCU_DIR)/drivers \
+	$(TOP)/$(SDK_DIR)/drivers/sim \
+	$(TOP)/$(SDK_DIR)/drivers/smc \
+	$(TOP)/$(SDK_DIR)/drivers/gpio \
+	$(TOP)/$(SDK_DIR)/drivers/port \
+	$(TOP)/$(SDK_DIR)/drivers/flash \
+	$(TOP)/$(SDK_DIR)/drivers/lpuart \
 	$(TOP)/$(SDK_DIR)/drivers/common 
 
